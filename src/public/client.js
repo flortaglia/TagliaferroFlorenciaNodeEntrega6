@@ -37,7 +37,7 @@ function renderMessages(messagesArray) {
             return(`<div>
                 <strong style="color: blue;" >${messageInfo.mail}</strong>[
                 <span style="color: brown;">${fecha}, ${argHora}</span>]:
-                <em style="color: green;">${messageInfo.message}</em> </div>`)
+                <em style="color: green;font-style: italic;">${messageInfo.message}</em> </div>`)
         }).join(" ");
 
         totalMessages.innerHTML = html

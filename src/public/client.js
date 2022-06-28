@@ -1,13 +1,15 @@
 // Lado cliente
 const socket = io() 
 //Fecha
+
 const tiempoTranscurrido = Date.now()
 const hoy = new Date(tiempoTranscurrido)
 const fecha= hoy.toLocaleDateString()
-const hora= hoy.getHours()
-const min=hoy.getMinutes()//ver si es menor de 10 me da sólo un número............
-const sec= hoy.getSeconds()
-console.log(`${fecha},${hora}:${min}:${sec} `)
+const tiempo = new Date()
+const argHora=tiempo.toLocaleTimeString('it-IT')
+
+// const hora= hoy.getHours()
+// const horafinal= hora.toString().padStart(2,"0")
 
 //CHAT 
 const formChat = document.querySelector('#formChat')
@@ -21,8 +23,9 @@ function sendMessage() {
     try {
         const mail = mailInput.value
         const message = messageInput.value
-    
-        socket.emit('client:message', { mail, message }) //emito el mensaje al servidor
+        const tiempochat = `${fecha}, ${argHora}`
+        console.log(tiempochat)
+        socket.emit('client:message', { mail, tiempochat, message }) //emito el mensaje al servidor
     } catch(error) {
         console.log(`Hubo un error ${error}`)
     }
@@ -33,7 +36,7 @@ function renderMessages(messagesArray) {
         const html = messagesArray.map(messageInfo => {
             return(`<div>
                 <strong style="color: blue;" >${messageInfo.mail}</strong>[
-                <span style="color: brown;">${fecha},${hora}:${min}:${sec}</span>]:
+                <span style="color: brown;">${fecha}, ${argHora}</span>]:
                 <em style="color: green;">${messageInfo.message}</em> </div>`)
         }).join(" ");
 
@@ -80,21 +83,15 @@ async function renderProducts (productsArray) {
         const plantilla = await response.text() //obtenemos el texto de la misma
         
         if (productsArray.length>0) {
-            // const template = Handlebars.compile(plantilla)
-            // const filled = template(productsArray, {noEscape:true}) 
-            // document.querySelector('#productosTabla').innerHTML = filled
-            
+            document.querySelector('#noProducts').innerHTML=""  
+            document.querySelector('#productosTabla').innerHTML = ""
             productsArray.forEach(product => {
                 const template = Handlebars.compile(plantilla)
                 const filled = template(product) 
-                document.querySelector('#productosTabla').innerHTML += filled
-            });
-            console.log(productsArray)
-            
-            
+                document.querySelector('#productosTabla').innerHTML += filled 
+            }); 
         }else{
-            let div = document.createElement("div")
-            document.querySelector('#noProducts').prepend("No hay ninguna producto :(", div )
+            document.querySelector('#noProducts').innerHTML = ("<h4>No hay ninguna producto :(</h4>")
         }
         
     } catch(error) {
@@ -112,22 +109,3 @@ formProducts.addEventListener('submit', event => {
 socket.on('serverSend:Products', productos=>{
       renderProducts(productos)
 });
-
-
-
-
-// async function renderProducts(products){
-//     const response = await fetch('/plantilla.hbs') //traemos la plantilla
-//     console.log(response)
-//     const plantilla = await response.text() //obtenemos el texto de la misma
-//     console.log(plantilla)
-//     products.forEach(product => {
-//         const template = Handlebars.compile(plantilla)
-//         const html = template(product)
-//         document.querySelector('#productos').innerHTML += html
-//     })
-// }
-// renderProducts()
-// socket.on('serverSend:Products', productos=>{
-//     renderProducts(products)
-// })

@@ -1,3 +1,4 @@
+const fs =require('fs')
 const express = require('express')
 const app = express()
 const puerto =8080
@@ -17,6 +18,15 @@ const productos= []
 
 app.use(express.static(path.join(__dirname,'/public')))
 
+async function escribir(){
+    try{
+        await fs.promises.writeFile(path.join(__dirname,'/chat'), JSON.stringify(messages))
+        console.log('guardado')
+    }catch(err){
+        console.log('no se pudo guardar el chat', err)
+    }
+
+}
 // LADO SERVIDOR
 io.on('connection', async socket=>{
     console.log('se conecto un usuario')
@@ -32,8 +42,7 @@ io.on('connection', async socket=>{
 
     socket.on('client:message', messageInfo=>{
         messages.push(messageInfo) //RECIBO mensaje y lo anido
+        escribir()
         io.emit('serverSend:message', messages)//EMITO CHATS
     })
-
-    // socket.emit('serverSend:Products',products)
 })
